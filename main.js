@@ -1,99 +1,68 @@
 class Product  {
     constructor(title, description, price, thumbnail, code, stock) {
-    this.id = Date.now(); // Genera un id único basado en la fecha y hora actual
     this.title = title;
     this.description = description;
     this.price = price;
     this.thumbnail = thumbnail;
     this.code = code;
     this.stock = stock;
+    this.id = Product.autoincrement();
+    }
+
+    static autoincrement(){
+        // Existe esta prop
+        if (this.id) {
+            this.id ++
+        } else {
+            //Si no existe le asigna 1
+            this.id = 1
+        }
+        return this.id
     }
 }
 
 class ProductManager {
+
     constructor() {
-    this.products = [];
+        this.products = [];
     }
 
-    getProducts() {
-    return this.products;
-    }
-
-    addProduct(title, description, price, thumbnail, code, stock) {
+    
+    addProduct(product) {
     // Comprobar si el código ya está en uso
-    const isCodeRepeated = this.products.some(product => product.code === code);
+        const code = this.products.find(prod => prod.code === product.code);
 
-    if (isCodeRepeated) {
-        console.error('El código de producto ya está en uso.');
+        if (code) {
+            console.error('Producto ya agregado');
+        } else{
+            // Crear un nuevo producto y agregarlo al arreglo
+            this.products.push(product);
+        }
+
+        
     }
-
-    // Crear un nuevo producto y agregarlo al arreglo
-    const newProduct = new Product(title, description, price, thumbnail, code, stock);
-    this.products.push(newProduct);
+        
+    getProducts() {
+        return this.products;
     }
 
     getProductById(id) {
-    const product = this.products.find(product => product.id === id);
+        const product = this.products.find(product => product.id === id);
 
-    if (!product) {
-        console.error('No se encontró el producto con el id proporcionado.');
-    }
+        if (product) {
+            console.log(product);
+        } else{
+            console.error('No existe ese ID')
+        }
 
-    return product;
+        return product;
     }
 }
 
 // Crear una instancia de la clase "ProductManager"
 const productManager = new ProductManager();
 
-// Llamar a "getProducts" recién creada la instancia, debe devolver un arreglo vacío []
-const products = productManager.getProducts();
-console.log(products); // []
+const producto1 = productManager.addProduct("Iphone","14 Pro",2000,[],"P0001",25)
+const producto2 = productManager.addProduct("Samsung", "13 Pro", 1000, [], "P0002", 5)
+const producto3 = productManager.addProduct("Lg", "12 Pro", 500, [], "P0003", 15)
 
-// Llamar al método "addProduct" con los campos indicados
-try {
-    productManager.addProduct(
-    "producto prueba",
-    "Este es un producto prueba",
-    200,
-    "Sin imagen",
-    "abc123",
-    25
-    );
-    console.log("Producto agregado satisfactoriamente.");
-} catch (error) {
-  console.error(error.message); // En caso de error, imprimirá el mensaje de error
-}
-
-// Llamar al método "getProducts" nuevamente, debe aparecer el producto recién agregado
-const productsAfterAdd = productManager.getProducts();
-console.log(productsAfterAdd);
-
-// Llamar al método "addProduct" con los mismos campos de arriba, debe arrojar un error porque el código estará repetido.
-try {
-    productManager.addProduct(
-    "producto repetido",
-    "Este es un producto repetido",
-    150,
-    "Sin imagen",
-    "abc123",
-    15
-    );
-    console.log("Producto agregado satisfactoriamente.");
-} catch (error) {
-    console.error(error.message);
-}
-
-// Probar el método "getProductById" con un id existente
-const productId = productsAfterAdd[0].id;
-const productById = productManager.getProductById(productId);
-console.log(productById);
-
-// Probar el método "getProductById" con un id inexistente
-const nonExistingProductId = 0;
-try {
-    const nonExistingProduct = productManager.getProductById(nonExistingProductId);
-    console.log(nonExistingProduct);
-} catch (error) {
-  console.error(error.message); // Debe mostrar "No se encontró el producto con el id proporcionado."
-}
